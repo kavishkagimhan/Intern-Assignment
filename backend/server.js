@@ -19,5 +19,8 @@ dotenv.config();
 // MongoDB Connection
 dbConnect();
 
+//routes
+app.use("/api/location", require("./routes/locationRoutes"));
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
