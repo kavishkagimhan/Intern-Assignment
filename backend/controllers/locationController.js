@@ -1,81 +1,72 @@
-const Location = require('../models/Location');
+// controllers/locationController.js
+const Location = require('../models/location');
 
-// Controller function to get all locations
+// Controller functions
 const getAllLocations = async (req, res) => {
-  try {
-    const locations = await Location.find().populate('devices');
-    res.json(locations);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// Controller function to get a single location by ID
-const getLocationById = async (req, res) => {
-  try {
-    const location = await Location.findById(req.params.id).populate('devices');
-    if (!location) {
-      return res.status(404).json({ message: 'Location not found' });
+    try {
+        const locations = await Location.find().populate('devices');
+        res.json(locations);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-    res.json(location);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
 };
 
-// Controller function to create a new location
 const createLocation = async (req, res) => {
-  const { name, address, phone } = req.body;
-
-  try {
-    const location = new Location({ name, address, phone });
-    const newLocation = await location.save();
-    res.status(201).json(newLocation);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+    const location = new Location(req.body);
+    try {
+        const newLocation = await location.save();
+        res.status(201).json(newLocation);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
-// Controller function to update a location by ID
-const updateLocationById = async (req, res) => {
-  try {
-    const location = await Location.findById(req.params.id);
-    if (!location) {
-      return res.status(404).json({ message: 'Location not found' });
+const getLocationById = async (req, res, next) => {
+    let location;
+    try {
+        location = await Location.findById(req.params.id).populate('devices');
+        if (location == null) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 
-    // Update location details
-    for (const key in req.body) {
-      if (req.body[key] != null) {
-        location[key] = req.body[key];
-      }
-    }
-
-    const updatedLocation = await location.save();
-    res.json(updatedLocation);
-  } catch (err) {
-    res.status(400).json({ message: 'Location update unsuccessful', error: err.message });
-  }
+    res.location = location;
+    next();
 };
 
-// Controller function to delete a location by ID
-const deleteLocationById = async (req, res) => {
-  try {
-    const location = await Location.findById(req.params.id);
-    if (!location) {
-      return res.status(404).json({ message: 'Location not found' });
+const updateLocation = async (req, res) => {
+    if (req.body.name != null) {
+        res.location.name = req.body.name;
     }
-    await location.deleteOne();
-    res.json({ message: 'Location deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    if (req.body.address != null) {
+        res.location.address = req.body.address;
+    }
+    if (req.body.phone != null) {
+        res.location.phone = req.body.phone;
+    }
+    try {
+        const updatedLocation = await res.location.save();
+        res.json(updatedLocation);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const deleteLocation = async (req, res) => {
+    try {
+        await res.location.remove();
+        res.json({ message: 'Location deleted' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 module.exports = {
-  getAllLocations,
-  getLocationById,
-  createLocation,
-  updateLocationById,
-  deleteLocationById
+    getAllLocations,
+    createLocation,
+    getLocationById,
+    updateLocation,
+    deleteLocation
 };
