@@ -21,7 +21,7 @@ dbConnect();
 
 //routes
 app.use("/api/location", require("./routes/locationRoutes"));
-app.use("/api/devices", require("./routes/deviceRoutes"));
+//app.use("/api/devices", require("./routes/deviceRoutes"));
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
