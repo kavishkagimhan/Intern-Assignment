@@ -1,5 +1,7 @@
-import axios from 'axios';
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const AddLocation = () => {
     const [formData, setFormData] = useState({
@@ -9,6 +11,7 @@ const AddLocation = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,6 +21,10 @@ const AddLocation = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isSubmitting) return; // If already submitting, exit
+
+        setIsSubmitting(true); // Set submission state to true
 
         // Validation
         const errors = {};
@@ -35,21 +42,33 @@ const AddLocation = () => {
 
         if (Object.keys(errors).length > 0) {
             setErrors(errors);
+            setIsSubmitting(false); // Reset submission state
         } else {
-            // Form submission logic
             try {
-                const res = await axios.post('http://localhost:5000/api/location/', formData)
-                console.log(res.message);
+                const res = await axios.post('http://localhost:5000/api/location/', formData);
+                console.log(res.data.message);
                 setFormData({
                     name: '',
                     address: '',
                     phone: ''
                 });
+                toast.success("Location Added Success!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                });
             }
             catch (error) {
                 console.error(error);
             }
-            
+            finally {
+                setIsSubmitting(false); // Reset submission state
+            }
         }
     };
 
@@ -72,7 +91,9 @@ const AddLocation = () => {
                     <input type="text" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full border rounded px-3 py-2 mt-1" />
                     {errors.phone && <p className="text-red-500 mt-1">{errors.phone}</p>}
                 </div>
-                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Add Location</button>
+                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" disabled={isSubmitting}>
+                    {isSubmitting ? 'Submitting...' : 'Add Location'}
+                </button>
             </form>
         </div>
     );

@@ -5,6 +5,7 @@ const locationController = require('../controllers/locationController');
 
 router.post('/', locationController.createLocation);
 router.get('/', locationController.getAllLocations);
+router.delete('/:id', locationController.deleteLocation);
 router.get('/:id', locationController.getLocationById);
 router.post('/:id/devices', locationController.addDeviceToLocation);
 router.delete('/:locationId/devices/:deviceId', locationController.removeDeviceFromLocation);
