@@ -78,7 +78,7 @@ const ViewLocation = (props) => {
                                         )}
                                     </div>
                                 </div>
-                                <button onClick={() => {handleDelete(device._id)}} className='text-sm font-semibold text-red-600 hover:underline'>Delete</button>
+                                <button onClick={() => {handleDelete(device._id)}} className='px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:underline'>Remove</button>
                             </div>
                         ))}
                     </div>
